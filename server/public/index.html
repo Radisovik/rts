@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>RTS By Eric</title>
+</head>
+<script src="//cdn.rawgit.com/dcodeIO/protobuf.js/6.11.2/dist/protobuf.js"></script>
+
+<body>
+Hello world4
+<script type = "module">
+    protobuf.load("messages.proto", function(err, root) {
+        if(err)
+            throw err;
+
+        var FromServer = root.lookupType("rts.FromServer")
+
+        let webSocket = new WebSocket("ws://localhost:8000/ws");
+        webSocket.binaryType = 'arraybuffer'
+
+        webSocket.onclose = function(event) {
+            console.log("Closed it " + event)
+        }
+        webSocket.onopen = function(event) {
+            console.log("websocket open " + event)
+
+        }
+        webSocket.onmessage = function (event) {
+            msg = event.data
+            buffer = Uint8Array.from(atob(msg), c=>c.charCodeAt(0))
+            var message = FromServer.decode(buffer);
+            console.log("Do a message? " + message)
+        }
+    })
+
+</script>
+
+</body>
+</html>
