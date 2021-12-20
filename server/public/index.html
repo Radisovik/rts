@@ -13,7 +13,7 @@ Hello world4
         if(err)
             throw err;
 
-        var FromServer = root.lookupType("rts.FromServer")
+        let FromServer = root.lookupType("rts.FromServer")
 
         let webSocket = new WebSocket("ws://localhost:8000/ws");
         webSocket.binaryType = 'arraybuffer'
@@ -26,10 +26,13 @@ Hello world4
 
         }
         webSocket.onmessage = function (event) {
-            msg = event.data
-            buffer = Uint8Array.from(atob(msg), c=>c.charCodeAt(0))
-            var message = FromServer.decode(buffer);
-            console.log("Do a message? " + message)
+            let msg = event.data
+            let message = FromServer.decode(new Uint8Array(msg))
+            // let s = window.atob(msg);
+            // //let buffer = Uint8Array.from(s, c=>c.charCodeAt(0))
+            // let buffer = Uint8Array.from(s)
+            // let message = FromServer.decode(buffer);
+            console.log("Do a message? " + JSON.stringify(message))
         }
     })
 

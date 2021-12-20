@@ -3,9 +3,11 @@ package main
 import (
 	"embed"
 	"github.com/gorilla/websocket"
+	"google.golang.org/protobuf/proto"
 	"io/fs"
 	"log"
 	"net/http"
+	"server/messages"
 )
 
 //go:embed public/*
@@ -31,6 +33,14 @@ func gameConnection(w http.ResponseWriter, r *http.Request) {
 	}
 	defer c.Close()
 	log.Printf("New inbound websocket connection from %v", r.RemoteAddr)
+	fs := &messages.FromServer{
+		Type:  messages.FromServer_Hello,
+		Hello: &messages.Hello{Greeting: "hello world"},
+	}
+	marshal, err := proto.Marshal(fs)
+	chk(err)
+	err = c.WriteMessage(websocket.BinaryMessage, marshal)
+	chk(err)
 	for {
 		mt, message, err := c.ReadMessage()
 		if err != nil {

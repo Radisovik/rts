@@ -1,6 +1,6 @@
 syntax = "proto3";
 package rts;
-option go_package = "/main";
+option go_package = "/messages";
 
 
 message FromServer {
@@ -8,8 +8,12 @@ message FromServer {
   enum SType {
     Hello =0;
   }
+  Hello hello =2;
 }
 
+message Hello {
+  string greeting =1;
+}
 
 message FromClient {
   CType type =1;
