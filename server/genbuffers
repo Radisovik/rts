@@ -1,2 +1,6 @@
 #!/bin/sh
-protoc -I=. --go_out=. public/messages.proto
+cd public
+protoc -I=. --go_out=. messages.proto
+mv messages.pb.go ..
+cd ..
+

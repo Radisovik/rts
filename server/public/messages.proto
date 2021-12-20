@@ -1,14 +1,23 @@
 syntax = "proto3";
 package rts;
-option go_package = "/messages";
+option go_package = "main";
 
 
 message FromServer {
-  SType type =1;
-  enum SType {
-    Hello =0;
+  uint64 epoch =1;
+  oneof msg {
+    Hello hello = 2;
+    Ping ping=3;
+    Pong pong=4;
   }
-  Hello hello =2;
+}
+
+message Ping {
+  uint64 sentAt =1;
+}
+
+message Pong {
+  uint64 replyfrom =1;
 }
 
 message Hello {
@@ -16,11 +25,12 @@ message Hello {
 }
 
 message FromClient {
-  CType type =1;
-  enum CType {
-    Hello = 0;
+  uint64 epoch =1;
+  oneof msg {
+    Hello hello = 2;
+    Ping ping=3;
+    Pong pong=4;
   }
-  Hello hello =2;
 }
 
 

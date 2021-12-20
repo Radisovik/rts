@@ -7,8 +7,9 @@
 <script src="//cdn.rawgit.com/dcodeIO/protobuf.js/6.11.2/dist/protobuf.js"></script>
 
 <body>
-Hello world4
+Hello world5
 <script type = "module">
+    console.log("Current time: " + new Date())
     protobuf.load("messages.proto", function(err, root) {
         if(err)
             throw err;
@@ -16,7 +17,8 @@ Hello world4
         let FromServer = root.lookupType("rts.FromServer")
         let FromClient = root.lookupType("rts.FromClient")
 
-        let greetings = {CType:0,Hello:{greeting:"Hello world -- I'm a web client"}}
+        let greetings = {hello:{greeting:"Hello -- I'm a web browser"}}
+        FromClient.setup()
         let errMsg = FromClient.verify(greetings)
         if (errMsg) {
             throw Error(errMsg)
@@ -31,20 +33,14 @@ Hello world4
             console.log("Closed it " + event)
         }
         webSocket.onopen = function(event) {
-            console.log("websocket open " + event)
-            console.log("Gonna send greetings: " + JSON.stringify(greetings))
-            console.log("Gonna send sendThis: " + JSON.stringify(sendThis))
-            console.log("Gonna send buffer: " + JSON.stringify(sendThisBuffer))
+            console.log("websocket open " + JSON.stringify(event))
             webSocket.send(sendThisBuffer)
         }
         webSocket.onmessage = function (event) {
             let msg = event.data
             let message = FromServer.decode(new Uint8Array(msg))
-            // let s = window.atob(msg);
-            // //let buffer = Uint8Array.from(s, c=>c.charCodeAt(0))
-            // let buffer = Uint8Array.from(s)
-            // let message = FromServer.decode(buffer);
             console.log("Do a message? " + JSON.stringify(message))
+            console.log("can find the stuff: " + message.hello.greeting)
         }
     })
 
