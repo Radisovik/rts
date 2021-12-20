@@ -14,16 +14,28 @@ Hello world4
             throw err;
 
         let FromServer = root.lookupType("rts.FromServer")
+        let FromClient = root.lookupType("rts.FromClient")
+
+        let greetings = {CType:0,Hello:{greeting:"Hello world -- I'm a web client"}}
+        let errMsg = FromClient.verify(greetings)
+        if (errMsg) {
+            throw Error(errMsg)
+        }
+        let sendThis = FromClient.create(greetings);
+        let sendThisBuffer = FromClient.encode(sendThis).finish();
 
         let webSocket = new WebSocket("ws://localhost:8000/ws");
-        webSocket.binaryType = 'arraybuffer'
+        webSocket.binaryType = 'arraybuffer';
 
         webSocket.onclose = function(event) {
             console.log("Closed it " + event)
         }
         webSocket.onopen = function(event) {
             console.log("websocket open " + event)
-
+            console.log("Gonna send greetings: " + JSON.stringify(greetings))
+            console.log("Gonna send sendThis: " + JSON.stringify(sendThis))
+            console.log("Gonna send buffer: " + JSON.stringify(sendThisBuffer))
+            webSocket.send(sendThisBuffer)
         }
         webSocket.onmessage = function (event) {
             let msg = event.data

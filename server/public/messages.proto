@@ -20,6 +20,7 @@ message FromClient {
   enum CType {
     Hello = 0;
   }
+  Hello hello =2;
 }
 
 
