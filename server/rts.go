@@ -9,6 +9,7 @@ import (
 	"log"
 	"net/http"
 	"os"
+	"server/ds"
 	"time"
 )
 
@@ -40,11 +41,22 @@ func setupWebHandler() {
 
 }
 
+var players ds.ThreadSafeSlice[Player]
+
+type any = interface{}
+
 func exists(path string) bool {
 	if _, err := os.Stat(path); os.IsNotExist(err) {
 		return false
 	}
 	return true
+}
+
+type V3i [3]int
+
+type Player struct {
+	name       string
+	hqLocation V3i
 }
 
 func gameConnection(w http.ResponseWriter, r *http.Request) {
@@ -74,6 +86,35 @@ func gameConnection(w http.ResponseWriter, r *http.Request) {
 	chk(err)
 	err = c.WriteMessage(websocket.BinaryMessage, marshal)
 	chk(err)
+	writer := make(chan *FromServer, 2)
+	p := Player{
+		name:       currentUser,
+		hqLocation: [3]int{10, 0, 10},
+	}
+
+	players.Append(p)
+
+	info("Player list: %v", players)
+	go func() {
+		defer info("Goroutine writer for this client is exiting!")
+		for {
+			select {
+			case fs, ok := <-writer:
+				if !ok {
+					info("Writer channel hs been closed... ")
+					return
+				}
+				if bytes, err := proto.Marshal(fs); err != nil {
+					info("Failed to marshal data to send to client %v", err)
+					return
+				} else if err := c.WriteMessage(websocket.BinaryMessage, bytes); err != nil {
+					info("Error writing to client %v", err)
+					break
+				}
+			}
+		}
+	}()
+
 	for {
 		mt, message, err := c.ReadMessage()
 		if err != nil {

@@ -4,32 +4,61 @@ option go_package = "main";
 
 
 message FromServer {
-  uint64 epoch =1;
+  uint64 epoch = 1;
   oneof msg {
     Hello hello = 2;
-    Ping ping=3;
-    Pong pong=4;
+    Ping ping = 3;
+    Pong pong = 4;
+    GameUpdates gameUpdates = 5;
   }
 }
 
+message GameUpdates {
+  uint32 tick = 1;
+  repeated GameUpdate gameUpdate = 2;
+}
+
+message GameUpdate {
+  oneof update {
+    MOBUpdate mobUpdate = 1;
+  }
+}
+
+message MOBUpdate {
+  Vector3i at = 1;
+  Vector3f velocity = 2;
+}
+
+message Vector3f {
+  float x = 1;
+  float y = 2;
+  float z = 3;
+}
+
+message Vector3i {
+  int32 x = 1;
+  int32 y = 2;
+  int32 z = 3;
+}
+
 message Ping {
-  uint64 sentAt =1;
+  uint64 sentAt = 1;
 }
 
 message Pong {
-  uint64 replyfrom =1;
+  uint64 replyfrom = 1;
 }
 
 message Hello {
-  string greeting =1;
+  string greeting = 1;
 }
 
 message FromClient {
-  uint64 epoch =1;
+  uint64 epoch = 1;
   oneof msg {
     Hello hello = 2;
-    Ping ping=3;
-    Pong pong=4;
+    Ping ping = 3;
+    Pong pong = 4;
   }
 }
 
